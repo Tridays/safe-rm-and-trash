@@ -8,8 +8,8 @@
 如果你想要更安全的执行rm命令和一个垃圾回收机制，那么`safe-rm-and-trash`可以让你的rm命令和数据变得更加安全。
 
 # 2.安装
-**注意事项:`safe-rm-and-trash`在ubuntu 16.04、18.04、20.04、22.04测试均正常使用，其他Linux系统请在模拟机测试正常使用，再考虑部署**
-**声明:`safe-rm-and-trash`在不同的操作系统难免会出现bug，不能保证万无一失，任何部署之前，请在模拟系统上进行大量测试，确保可用性，否则出现误删除请自行承担**
+**注意事项:`safe-rm-and-trash`在ubuntu 16.04、18.04、20.04、22.04测试均正常使用，其他Linux系统请在模拟机测试正常使用，再考虑部署**<br />
+**声明:`safe-rm-and-trash`在不同的操作系统难免会出现bug，不能保证万无一失，任何部署之前，请在模拟系统上进行大量测试，必要时使用`-i`，确保可用性，否则出现误删除请自行承担**
 步骤一（下载脚本）：<br />
 1.使用curl
 ```bash
@@ -64,23 +64,33 @@ link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/safe-install.png?raw=true)
 
 **注意事项:**
-进行rm测试时，请确保他是rm.sh而不是系统的rm，如下：
+进行rm测试时，请确保他是rm.sh而不是系统的rm，必要时使用`-i`，如下：
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/04.png?raw=true)
 
-(3)在系统根目录测试
+(3)在系统根目录进行危险操作测试⚠️
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/05.png?raw=true)
 
-(4)在其他普通目录测试
+(4)在系统根二级目录危险操作测试⚠️
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/08.png?raw=true)
+
+(5)在系统根三级目录危险操作测试⚠️
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/09.png?raw=true)
+
+(6)在其他普通目录危险操作测试⚠️
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/06.png?raw=true)
 
 
-解释：不论您在哪个目录执行危险操作，`safe-rm-and-trash`会保护根目录`/`以及二级目录，当您执行`rm -rf /bin/*`是不被允许的，会被rm.sh拦截，但是你可以单个手动删除删除，如`rm -rf /bin/nginx`，或者您真的确认要需要删除时，请使用脚本提示的命令删除`/bin/rm.bak -rf ./bin/*`（这会被真正删除，危险操作！！！）
+解释：不论您在哪个目录执行危险操作，`safe-rm-and-trash`会保护根目录`/`以及二级目录，当您执行`rm -rf /bin/*`是不被允许的，会被rm.sh拦截，但是你可以单个手动删除，如`rm -rf /bin/nginx`，或者您真的确认要需要删除时，请使用脚本提示的命令删除`/bin/rm.bak -rf ./bin/*`（这会被真正删除，危险操作！！！）
 
 
-(5)删除普通文件/文件夹测试
+(7)删除普通文件/文件夹测试
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/07.png?raw=true)
 
-(6)把普通文件/文件夹移除到垃圾回收站测试（请使用`-b`）
+(8)把普通文件/文件夹移除到垃圾回收站测试（使用`-b`）
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/10.png?raw=true)
+
+(9)以sudo删除文件/文件夹测试
+
 
 
 # 哪些是重要文件？
