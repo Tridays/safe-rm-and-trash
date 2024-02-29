@@ -27,18 +27,18 @@ cd safe-rm-and-trash
 ```bash
 sudo bash ./rm.sh --install
 ```
-普通模式，安装过程部分脚本执行的操作。[保留/bin/rm]： 
-cp ./rm.sh --> /bin/rm.sh 
-cp /bin/rm --> /bin/rm.bak | cp /usr/bin/rm --> /usr/bin/ rm.bak 
-echo "alias rm=/bin/rm.sh" | tee -a /etc/profile 
+普通模式，安装过程部分脚本执行的操作。[保留/bin/rm]： <br />
+cp ./rm.sh --> /bin/rm.sh <br />
+cp /bin/rm --> /bin/rm.bak | cp /usr/bin/rm --> /usr/bin/rm.bak<br />
+echo "alias rm=/bin/rm.sh" | tee -a /etc/profile <br />
 
 2.以安全模式安装 --safe-install
 ```bash
 sudo bash ./rm.sh --safe-install
 ```
-安全模式，安装过程部分脚本执行的操作（比普通模式多了以下操作）。[完全替代rm工作]： 
-del /bin/rm | del /usr/bin/rm 
-link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm 
+安全模式，安装过程部分脚本执行的操作（比普通模式多了以下操作）。[完全替代rm工作]： <br />
+del /bin/rm | del /usr/bin/rm <br />
+link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 
 
 # 工作方式
