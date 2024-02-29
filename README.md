@@ -2,13 +2,13 @@
 
 [[English](https://github.com/malongshuai/safe-rm-and-trash/blob/master/README.md) | 简体中文]
 # 引言
-如果你经常不小心执行危险的rm，例如：
+如果你经常不小心执行危险的rm，例如：<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/01.png?raw=true)
-
+<br />
 如果你想要更安全的执行rm命令和一个垃圾回收机制，那么`safe-rm-and-trash`可以让你的rm命令和数据变得更加安全。
 
 # 安装
-步骤一（下载脚本）：
+步骤一（下载脚本）：<br />
 1.使用curl
 ```bash
 curl -s "https://raw.githubusercontent.com/Tridays/safe-rm-and-trash/main/rm.sh" -o ~/rm.sh
@@ -22,7 +22,7 @@ wget -c "https://raw.githubusercontent.com/Tridays/safe-rm-and-trash/main/rm.sh"
 git clone "https://github.com/Tridays/safe-rm-and-trash"
 cd safe-rm-and-trash
 ```
-步骤二（安装脚本）：
+步骤二（安装脚本）：<br />
 1.以普通模式安装 --install
 ```bash
 sudo bash ./rm.sh --install
@@ -30,7 +30,7 @@ sudo bash ./rm.sh --install
 普通模式，安装过程部分脚本执行的操作。[保留/bin/rm]： <br />
 cp ./rm.sh --> /bin/rm.sh <br />
 cp /bin/rm --> /bin/rm.bak | cp /usr/bin/rm --> /usr/bin/rm.bak<br />
-echo "alias rm=/bin/rm.sh" | tee -a /etc/profile <br />
+echo "alias rm=/bin/rm.sh" | tee -a /etc/profile <br /><br />
 
 2.以安全模式安装 --safe-install
 ```bash
@@ -45,10 +45,10 @@ link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 (1)`safe-rm-and-trash`会创建一个名为`/home/.trash`的垃圾回收站, 如果你想更改垃圾回收站的路径、回收站最大容量、单个文件允许的最大大小，请打开rm.sh修改。
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/02.png?raw=true)
 
-`safe-rm-and-trash`会自动检查rm被调用时传递的参数，如果参数中包含了重要文件，可能意味着这是一次危险的rm操作，`safe-rm-and-trash`会直接忽略本次rm。至于哪些属于重要文件，由你自己来决定（请打开rm.sh修改）。
+(2)`safe-rm-and-trash`会自动检查rm被调用时传递的参数，如果参数中包含了重要文件，可能意味着这是一次危险的rm操作，`safe-rm-and-trash`会直接忽略本次rm。至于哪些属于重要文件，由你自己来决定（请打开rm.sh修改）。
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/03.png?raw=true)
 
-`safe-rm-and-trash`对所有用户都有效，即包括已存在的用户和未来新创建的用户。
+(3)`safe-rm-and-trash`对所有用户都有效，即包括已存在的用户和未来新创建的用户。
 
 
 
