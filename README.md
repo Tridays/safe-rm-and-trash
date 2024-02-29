@@ -116,5 +116,7 @@ sudo crontab -e
 
 # 7.`safe-rm-and-trash`参数介绍
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/12.png?raw=true)
-除了这些选项是新增加的`-b、--install、--safe-install、--uninstall、--clean`之外，其余的选项和系统原生rm命令几乎一致。
-**注意事项:只有使用`-b`时，文件才会回收到垃圾站**
+除了这些选项是新增加的`-b、--install、--safe-install、--uninstall、--clean`之外，其余的选项和系统原生rm命令几乎一致。<br/>
+**注意事项:只有使用`-b`时，文件才会回收到垃圾站**<br/>
+**如果这个项目对你的数据安全有帮助，请帮忙点个`Star`**<br/>
+**如果发现脚本bug，欢迎提`issue`**<br/>
