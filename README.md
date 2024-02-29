@@ -1,13 +1,15 @@
 # safe-rm-and-trash
 
 [[English](https://github.com/malongshuai/safe-rm-and-trash/blob/master/README.md) | 简体中文]
-# 引言
+# 1.引言
 如果你经常不小心执行危险的rm，例如：<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/01.png?raw=true)
 <br />
 如果你想要更安全的执行rm命令和一个垃圾回收机制，那么`safe-rm-and-trash`可以让你的rm命令和数据变得更加安全。
 
-# 安装
+# 2.安装
+**注意事项:`safe-rm-and-trash`在ubuntu 16.04、18.04、20.04、22.04测试均正常使用，其他Linux系统请在模拟机测试正常使用，再考虑部署**
+**声明:`safe-rm-and-trash`在不同的操作系统难免会出现bug，不能保证万无一失，任何部署之前，请在模拟系统上进行大量测试，确保可用性，否则出现误删除请自行承担**
 步骤一（下载脚本）：<br />
 1.使用curl
 ```bash
@@ -26,6 +28,7 @@ cd safe-rm-and-trash
 1.以普通模式安装 --install
 ```bash
 sudo bash ./rm.sh --install
+source /etc/profile # 更新环境变量
 ```
 普通模式，安装过程部分脚本执行的操作。[保留/bin/rm]： <br />
 cp ./rm.sh --> /bin/rm.sh <br />
@@ -35,13 +38,14 @@ echo "alias rm=/bin/rm.sh" | tee -a /etc/profile <br /><br />
 2.以安全模式安装 --safe-install
 ```bash
 sudo bash ./rm.sh --safe-install
+source /etc/profile # 更新环境变量
 ```
 安全模式，安装过程部分脚本执行的操作（比普通模式多了以下操作）。[完全替代rm工作]： <br />
 del /bin/rm | del /usr/bin/rm <br />
 link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 
 
-# 工作方式
+# 3.工作方式
 (1)`safe-rm-and-trash`会创建一个名为`/home/.trash`的垃圾回收站, 如果你想更改垃圾回收站的路径、回收站最大容量、单个文件允许的最大大小，请打开rm.sh修改。
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/02.png?raw=true)
 
@@ -50,10 +54,36 @@ link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 
 (3)`safe-rm-and-trash`对所有用户都有效，即包括已存在的用户和未来新创建的用户。
 
+(4)`safe-rm-and-trash`替代rm时，会自动备份/bin/rm --> /bin/rm.bak。（注意：新版本系统rm可能在/usr/bin/目录下）。
+
+# 4.使用演示
+(1)普通安装模式（你会发现rm命令被rm.sh替代了, 但是保留了原来的/bin/rm）
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/install.png?raw=true)
+
+(2)安全安装模式（你会发现rm命令和/bin/rm被完全rm.sh替代了）
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/safe-install.png?raw=true)
+
+**注意事项:**
+进行rm测试时，请确保他是rm.sh而不是系统的rm，如下：
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/04.png?raw=true)
+
+(3)在系统根目录测试
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/05.png?raw=true)
+
+(4)在其他普通目录测试
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/06.png?raw=true)
+
+
+解释：不论您在哪个目录执行危险操作，`safe-rm-and-trash`会保护根目录`/`以及二级目录，当您执行`rm -rf /bin/*`是不被允许的，会被rm.sh拦截，但是你可以单个手动删除删除，如`rm -rf /bin/nginx`，或者您真的确认要需要删除时，请使用脚本提示的命令删除`/bin/rm.bak -rf ./bin/*`（这会被真正删除，危险操作！！！）
+
+
+(5)删除普通文件/文件夹测试
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/07.png?raw=true)
+
+(6)把普通文件/文件夹移除到垃圾回收站测试（请使用`-b`）
 
 
 # 哪些是重要文件？
-
 1. 根目录`/`以及根目录下的子目录、子文件总是被保护的
 2. 你可以在`/etc/security/rm_fileignore`中定义你自己觉得重要的文件，每行定义一个被保护的文件路径。例如：
 
