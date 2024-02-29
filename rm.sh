@@ -20,6 +20,7 @@ BANLIST=(
 "/home/$USER"
 "/home/$SUDO_USER"
 "/init"
+"/lib"
 "/lib32"
 "/lib64"
 "/libx32"
@@ -240,19 +241,19 @@ EOF
 function clean(){
     DIRS=("${TRASH_DIR}")
     if [ ${PARAMETER_f} = "true" ];then
-        "${RMBIN//RM/rm}.bak" -rf ${path}/* 
+        "${RMBIN//RM/rm}.bak" -rf ${TRASH_DIR}/* 
         ERROR $?
     else
-        if [ -d "${path}" ]; then
-            echo -e "Trash Dir: ${path}"
+        if [ -d "${TRASH_DIR}" ]; then
+            echo -e "Trash Dir: ${TRASH_DIR}"
             echo -en "Are you sure to clean it?[y|n]: " ""
             read op
             op="${op// /}"
             case $op in
                 y|Y)
                     if [ ! "${RMBIN}" == "" ]; then
-                        echo "Execute: del ${path}/*"
-                        "${RMBIN//RM/rm}.bak" -rf ${path}/* 
+                        echo "Execute: del ${TRASH_DIR}/*"
+                        "${RMBIN//RM/rm}.bak" -rf ${TRASH_DIR}/* 
                         ERROR $?
                     else
                         echo "Warn: Not found /usr/bin/rm or /bin/rm"
@@ -312,14 +313,24 @@ function judgingParameters(){
                 exit 1
             fi
         else
+            if [ "${Parameter:0:2}" = ".." ]; then
+                Parameter="$(readlink -f ${Parameter})"
+            fi
+            # echo "Parameter: $Parameter"
             for arg in "${BANLIST[@]}"; do
                 flag=flag
                 if [[ "${PWD}" == "/" ]];then
                     if [[ "${Parameter}" == "${arg//\//}" || "${Parameter}" == "." || "${Parameter}" == ".${arg}" || "${Parameter}" == ".${arg}/" || "${Parameter}" == "${arg}" || "${Parameter}" == "${arg}/" ]]; then
                         flag=true
                     fi
+                    if [[ "${Parameter}" == "..${arg}" || "${Parameter}" == "..${arg}/" ]]; then
+                        flag=true
+                    fi
                 else
                     if [[ "${Parameter}" == "${arg}" || "${Parameter}" == "${arg}/" ]]; then
+                        flag=true
+                    fi
+                    if [[ "${Parameter}" == "../${USER}" || "${Parameter}" == "..${arg}" || "${Parameter}" == "..${arg}/" ]]; then
                         flag=true
                     fi
                 fi
@@ -347,6 +358,7 @@ function judgingParameters(){
             FILE_FOLDER_LIST+=("${Parameter}")
         fi
     done
+    FILE_FOLDER_LIST=($(printf "%s\n" "${FILE_FOLDER_LIST[@]}" | sort -u))
 }
 
 
@@ -356,7 +368,7 @@ function rmBackup(){
     if [ ! "${script_path}" = "/bin/rm.sh" ];then
         if [ -f "/bin/rm.sh" ];then
             echo "Try: del /bin/rm.sh"
-            "${RMBIN//RM/rm}.bak" "/bin/rm.sh"
+            "${RMBIN//RM/rm}.bak" -rf "/bin/rm.sh"
             ERROR $?
         fi
 
@@ -398,7 +410,7 @@ function safeInstallScript(){
     do
         if [ -f ${item} ];then
             echo "Try: del ${item}"
-            "${RMBIN//RM/rm}.bak" ${item} 
+            "${RMBIN//RM/rm}.bak" -rf ${item} 
             ERROR $?
         fi
     done
@@ -411,8 +423,8 @@ function safeInstallScript(){
     ERROR $?
 
     # cp rm.sh -> rm 
-    echo "Try: cp -rf /bin/rm.sh ${RMBIN//RM/rm}"
-    cp -rf "/bin/rm.sh" ${RMBIN//RM/rm}
+    echo "Try: link /bin/rm.sh --> ${RMBIN//RM/rm}"
+    ln -s "/bin/rm.sh" ${RMBIN//RM/rm}
     ERROR $?
 
     # alias rm.sh as rm
@@ -430,7 +442,7 @@ function installScript(){
     do
         if [ -f ${item} ];then
             echo "Try: del ${item}"
-            "${RMBIN//RM/rm}.bak" ${item} 
+            "${RMBIN//RM/rm}.bak" -rf ${item} 
             ERROR $?
         fi
     done
@@ -460,7 +472,7 @@ function uninstallScript(){
         fi
         if [ -f ${item} ];then
             echo "Try: del ${item}"
-            "${RMBIN//RM/rm}.bak" ${item} 
+            "${RMBIN//RM/rm}.bak" -rf ${item} 
             ERROR $?
         fi
     done
@@ -592,7 +604,7 @@ function executeRm(){
 
             # 对于垃圾回收站，直接删除
             if [[ $arg == *"${TRASH_DIR}"* ]]; then
-                echo "CMD: $command $arg"
+                [ ${PARAMETER_f} = "false" ] && echo "CMD: $command $arg"
                 $command $arg
                 ERROR $?
                 continue
@@ -627,11 +639,18 @@ function executeRm(){
                     echo "cannot remove '${arg}': Is a directory"
                     exit -1
                 fi
+                if [ -d ${folder_file_path} ];then
+                    "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}  >>/dev/null 2>&1
+                    ERROR $?
+                fi
                 [ ${PARAMETER_f} = "false" ] && echo "CMD: del ${folder_file_path}"
                 "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}
                 ERROR $?
 
                 parent_dir=$(dirname "$folder_file_path")
+                if [ ! -d $parent_dir ];then
+                    mkdir -p $parent_dir
+                fi
                 
                 [ ${PARAMETER_f} = "false" ] && echo "Backup to: ${parent_dir}"
                 mv -f ${absolute_path} ${parent_dir}
@@ -639,10 +658,10 @@ function executeRm(){
                 continue
             else
                 echo -e "cannot stat $arg: No such file or directory"
-                exit -1
+                exit -13
             fi
         else
-            echo "CMD: $command $arg"
+            [ ${PARAMETER_f} = "false" ] && echo "CMD: $command $arg"
             $command $arg
             ERROR $?
         fi
@@ -670,6 +689,7 @@ args=("$@")
 if [ ${#args[@]} -eq 0 ]; then
     echo "rm: missing operand"
     echo "Try 'rm --help' for more information."
+    echo "By ThreeDays"
     exit 1
 fi
 Main #"${@}"
