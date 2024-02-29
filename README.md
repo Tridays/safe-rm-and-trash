@@ -1,6 +1,6 @@
 # safe-rm-and-trash
 
-[[English](https://github.com/malongshuai/safe-rm-and-trash/blob/master/README.md) | 简体中文]
+[[English](https://github.com/Tridays/safe-rm-and-trash/blob/main/README_en.md) | 简体中文]
 # 1.引言
 如果你经常不小心执行危险的rm，例如：<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/01.png?raw=true)
