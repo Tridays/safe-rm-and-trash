@@ -8,7 +8,7 @@
 如果你想要更安全的执行rm命令和一个垃圾回收机制，那么`safe-rm-and-trash`可以让你的rm命令和数据变得更加安全。
 
 # 2.安装
-**注意事项:`safe-rm-and-trash`在ubuntu 16.04、18.04、20.04、22.04测试均正常使用，其他Linux系统请在模拟机测试正常使用，再考虑部署**<br />
+**注意事项:`safe-rm-and-trash`在ubuntu 16.04、18.04、20.04、22.04测试均正常使用，其他Linux系统请在模拟机测试正常使用，再考虑部署**<br /><br />
 **声明:`safe-rm-and-trash`在不同的操作系统难免会出现bug，不能保证万无一失，任何部署之前，请在模拟系统上进行大量测试，必要时使用`-i`，确保可用性，否则出现误删除请自行承担**<br />
 步骤一（下载脚本）：<br />
 1.使用curl
@@ -93,53 +93,28 @@ link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/11.png?raw=true)
 
 
-# 哪些是重要文件？
-1. 根目录`/`以及根目录下的子目录、子文件总是被保护的
-2. 你可以在`/etc/security/rm_fileignore`中定义你自己觉得重要的文件，每行定义一个被保护的文件路径。例如：
+# 5.如何按时清空垃圾回收站？
+```bash
+sudo crontab -e
 
-    ```
-    /home/junmajinlong
-    /home/junmajinlong/apps
-    ```
+# 添加(每天00:00定时清空)
+0 0 * * * /bin/rm.sh -f --clean
 
-现在，该文件中定义的两个文件都被保护起来了，它们是安全的，不会被rm删除。
-
-**注意事项:**
-
-1. 显然，被保护的目录是不会进行递归的，所以'/bin'是安全的，而'/bin/aaa'是不安全的，除非你将它加入/etc/security/rm_fileignore文件中
-2. 根目录`/`以及根目录下的子目录是自动被保护的，不用手动将它们添加到/etc/security/rm_fileignore中
-3. /etc/security/rm_fileignore文件中定义的路径可以包含任意斜线，`safe-rm-and-trash`会自动处理。所以，'/home/junmajinlong'和'/home///junmajinlong/////'都是有效路径
-4. /etc/security/rm_fileignore中定义的路径中不要使用通配符，例如`/home/*`是无效的
-5. /etc/security/rm_fileignore中不要定义相对路径，要定义绝对路径
-
-# Usage
-
-1.git clone或拷贝仓库中的Shell脚本到你的主机上
-
-```
-$ git clone https://github.com/malongshuai/safe-rm-and-trash.git
+# 或者(每间隔3天的00:00定时清空)
+0 0 */3 * * /bin/rm.sh -f --clean
 ```
 
-2.执行该Shell脚本
 
-```
-$ cd safe-rm-and-trash
-$ sudo bash safe-rm-and-trash.sh
-```
+# 6.如何卸载`safe-rm-and-trash` || 恢复系统rm
+```bash
+# 你只需要执行，即可恢复系统rm
+/bin/rm.sh --uninstall
 
-执行完成后，你的rm命令就变成了安全的rm了。
-
-3.如果你确实想要删除被保护的文件，比如你明确知道/data是可以删除的，而根目录下的子目录默认总是被保护的，那么你 可以使用原生的rm命令，即/bin/rm.bak来删除。
-
-```
-$ rm.bak /path/to/file
+# 当需要时，还可以继续使用回rm.sh
+/bin/rm.sh --safe-install
 ```
 
-4.如果你想要卸载`safe-rm-and-trash`，执行函数`uninstall_safe-rm-and-trash`即可：
-
-```
-# 如果找不到该函数，则先exec bash，在执行即可
-$ uninstall_safe-rm-and-trash
-```
-
-卸载完成后，`/bin/rm`就变回原生的rm命令了。
+# 7.`safe-rm-and-trash`参数介绍
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/12.png?raw=true)
+除了这些选项是新增加的`-b、--install、--safe-install、--uninstall、--clean`之外，其余的选项和系统原生rm命令几乎一致。
+**注意事项:只有使用`-b`时，文件才会回收到垃圾站**
