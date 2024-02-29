@@ -48,11 +48,10 @@ link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 
 # 3.Way of working
 (1)`safe-rm-and-trash` will create a garbage bin named `/home/.trash`. If you want to change the path of the garbage bin, the maximum capacity of the garbage bin, or the maximum allowed size of a single file, please open rm.sh to modify it.<br />
-
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/02.png?raw=true)
-<br />
 
-(2)`safe-rm-and-trash` will automatically check the parameters passed when rm is called. If the parameters contain important files, it may indicate that this is a dangerous rm operation, and `safe-rm-and-trash` will directly ignore this rm operation. As for which files are important, it is up to you to decide (please open rm.sh to modify).
+
+(2)`safe-rm-and-trash` will automatically check the parameters passed when rm is called. If the parameters contain important files, it may indicate that this is a dangerous rm operation, and `safe-rm-and-trash` will directly ignore this rm operation. As for which files are important, it is up to you to decide (please open rm.sh to modify).<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/03.png?raw=true)
 
 (3)`safe-rm-and-trash`Effective for all users, including existing users and future newly created users.
