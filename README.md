@@ -9,7 +9,7 @@
 
 # 2.安装
 **注意事项:`safe-rm-and-trash`在ubuntu 16.04、18.04、20.04、22.04测试均正常使用，其他Linux系统请在模拟机测试正常使用，再考虑部署**<br />
-**声明:`safe-rm-and-trash`在不同的操作系统难免会出现bug，不能保证万无一失，任何部署之前，请在模拟系统上进行大量测试，必要时使用`-i`，确保可用性，否则出现误删除请自行承担**
+**声明:`safe-rm-and-trash`在不同的操作系统难免会出现bug，不能保证万无一失，任何部署之前，请在模拟系统上进行大量测试，必要时使用`-i`，确保可用性，否则出现误删除请自行承担**<br />
 步骤一（下载脚本）：<br />
 1.使用curl
 ```bash
@@ -90,7 +90,7 @@ link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/10.png?raw=true)
 
 (9)以sudo删除文件/文件夹测试
-
+![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/11.png?raw=true)
 
 
 # 哪些是重要文件？
