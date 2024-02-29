@@ -1,6 +1,6 @@
 # safe-rm-and-trash
 
-[[English](https://github.com/malongshuai/safe-rm-and-trash/blob/master/README.md) | 简体中文]
+[[English] | [简体中文](https://github.com/Tridays/safe-rm-and-trash/blob/main/README.md)]
 # 1.Introduction
 If you often accidentally perform dangerous RMs, such as：<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/01.png?raw=true)
@@ -47,7 +47,7 @@ link /bin/rm.sh --> /bin/rm | link /bin/rm.sh --> /usr/ bin/rm<br />
 
 
 # 3.Way of working
-(1)`safe-rm-and-trash` will create a garbage bin named `/home/.trash`. If you want to change the path of the garbage bin, the maximum capacity of the garbage bin, or the maximum allowed size of a single file, please open rm.sh to modify it.
+(1)`safe-rm-and-trash` will create a garbage bin named `/home/.trash`. If you want to change the path of the garbage bin, the maximum capacity of the garbage bin, or the maximum allowed size of a single file, please open rm.sh to modify it.<br />
 ![alt text](https://github.com/Tridays/safe-rm-and-trash/blob/main/02.png?raw=true)
 
 (2)`safe-rm-and-trash` will automatically check the parameters passed when rm is called. If the parameters contain important files, it may indicate that this is a dangerous rm operation, and `safe-rm-and-trash` will directly ignore this rm operation. As for which files are important, it is up to you to decide (please open rm.sh to modify).
