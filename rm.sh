@@ -364,21 +364,6 @@ function judgingParameters(){
 
 RMLIST=("/usr/bin/RM" "/bin/RM" "/usr/bin/rm" "/bin/rm")
 function rmBackup(){
-    script_path=$(readlink -f "$0")
-    if [ ! "${script_path}" = "/bin/rm.sh" ];then
-        if [ -f "/bin/rm.sh" ];then
-            echo "Try: del /bin/rm.sh"
-            "${RMBIN//RM/rm}.bak" -rf "/bin/rm.sh"
-            ERROR $?
-        fi
-
-        echo "Try: cp -rf ${script_path} /bin/"
-        cp -rf ${script_path} /bin/
-        ERROR $?
-    fi
-    if [ -f "${RMBIN//RM/rm}.bak" ]; then
-        return
-    fi
     rmbin=""
     for item in ${RMLIST[@]};
     do
@@ -402,6 +387,20 @@ function rmBackup(){
         cp -rf ${rmbin} "${rmbin//RM/rm}.bak"
         ERROR $?
     fi
+    
+    
+    script_path=$(readlink -f "$0")
+    if [ ! "${script_path}" = "/bin/rm.sh" ];then
+        if [ -f "/bin/rm.sh" ];then
+            echo "Try: del /bin/rm.sh"
+            "${RMBIN//RM/rm}.bak" -rf "/bin/rm.sh"
+            ERROR $?
+        fi
+
+        echo "Try: cp -rf ${script_path} /bin/"
+        cp -rf ${script_path} /bin/
+        ERROR $?
+    fi    
 }
 
 function safeInstallScript(){
@@ -617,7 +616,10 @@ function executeRm(){
                 echo "Warn: Current '${arg}' size exceeds default single file size (MAXSIZE=${MAXSIZE}B=>${max_size}G) ! Exit..."
                 exit -1
             fi
-    
+            
+            user=$(stat -c "%U" $absolute_path)
+            # echo "absolute_path: $absolute_path"
+            # echo "user: $user"
             if [ -f "$absolute_path" ]; then
                 [ ${PARAMETER_f} = "false" ] && echo "CMD: del ${folder_file_path}"
                 "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}  >>/dev/null 2>&1
@@ -626,7 +628,7 @@ function executeRm(){
                 parent_dir=$(dirname "$folder_file_path")
                 
                 if [ ! -d ${parent_dir} ];then
-                    mkdir -p ${parent_dir}
+                    sudo -u $user mkdir -p ${parent_dir}
                     ERROR $?
                 fi
 
@@ -649,7 +651,7 @@ function executeRm(){
 
                 parent_dir=$(dirname "$folder_file_path")
                 if [ ! -d $parent_dir ];then
-                    mkdir -p $parent_dir
+                    sudo -u $user mkdir -p $parent_dir
                 fi
                 
                 [ ${PARAMETER_f} = "false" ] && echo "Backup to: ${parent_dir}"
