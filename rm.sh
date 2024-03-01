@@ -81,7 +81,7 @@ function findRm(){
         RMBIN="/bin/rm"
         return
     else
-        echo "Warn: Not found /usr/bin/rm or /bin/rm"
+        echo "[rm.sh]Warn: Not found /usr/bin/rm or /bin/rm"
     fi
 }
 
@@ -95,19 +95,19 @@ function checkTrashDir(){
     elif [[ "${USER}" = "root" && ! ${SUDO_USER} = "root" ]];then
         user=${SUDO_USER}
     else
-        echo "Create the garbage collector using the normal user's sudo instead of logging in to root !"
+        echo "[rm.sh]Create the garbage collector using the normal user's sudo instead of logging in to root !"
         exit -1       
     fi
     
     if [[ ! -d "$TRASH_DIR" ]]; then
-        echo "Trash DIR: ${TRASH_DIR}"
-        echo "Trash directory does not exist. Try creating..."
+        echo "[rm.sh]Trash DIR: ${TRASH_DIR}"
+        echo "[rm.sh]Trash directory does not exist. Try creating..."
         mkdir -p "$TRASH_DIR" >>/dev/null 2>&1
         ERROR $?
         
         chown ${user}:${user} ${TRASH_DIR}
         ERROR $?
-        echo "Trash directory created successfully."            
+        echo "[rm.sh]Trash directory created successfully."            
     fi
 }
 
@@ -252,21 +252,21 @@ function clean(){
             case $op in
                 y|Y)
                     if [ ! "${RMBIN}" == "" ]; then
-                        echo "Execute: del ${TRASH_DIR}/*"
+                        echo "[rm.sh]Execute: del ${TRASH_DIR}/*"
                         "${RMBIN//RM/rm}.bak" -rf ${TRASH_DIR}/* 
                         ERROR $?
                     else
-                        echo "Warn: Not found /usr/bin/rm or /bin/rm"
+                        echo "[rm.sh]Warn: Not found /usr/bin/rm or /bin/rm"
                         exit 1
                     fi
                 ;;
                 *)
-                    echo "Not doing anything, EXIT..."
+                    echo "[rm.sh]Not doing anything, EXIT..."
                     continue
                     ;;
             esac
         else
-            echo "The trash dir is empty..."
+            echo "[rm.sh]The trash dir is empty..."
         fi
     fi
 }
@@ -274,9 +274,11 @@ function clean(){
 
 function upddateCapacitySize(){
     # 对于超过MAXSIZE的，不执行
+    user=$(stat -c "%U" $TRASH_DIR)
     capacity_size=$(du -s -b ${TRASH_DIR} | awk '{print $1}') 
     config_file=$1
     echo "${capacity_size}" > ${config_file}
+    chown $user:$user ${config_file}
 }
 
 
@@ -308,8 +310,8 @@ function judgingParameters(){
                 fi
                 enableOption ${Parameter//[ -]/}
             else
-                echo "rm: unrecognized option '${Parameter}'"
-                echo "Try 'rm --help' for more information."
+                echo "[rm.sh]rm: unrecognized option '${Parameter}'"
+                echo "[rm.sh]Try 'rm --help' for more information."
                 exit 1
             fi
         else
@@ -377,13 +379,13 @@ function rmBackup(){
     done
 
     if [ -z $rmbin ];then
-        echo "Warn: Not found /usr/bin/rm or /bin/rm"
+        echo "[rm.sh]Warn: Not found /usr/bin/rm or /bin/rm"
         exit -1
     fi
 
     # cp rm --> rm.bak
     if [ ! -f "${rmbin//RM/rm}.bak" ]; then
-        echo "Try: cp -rf ${rmbin} "${rmbin//RM/rm}.bak""
+        echo "[rm.sh]Try: cp -rf ${rmbin} "${rmbin//RM/rm}.bak""
         cp -rf ${rmbin} "${rmbin//RM/rm}.bak"
         ERROR $?
     fi
@@ -392,12 +394,12 @@ function rmBackup(){
     script_path=$(readlink -f "$0")
     if [ ! "${script_path}" = "/bin/rm.sh" ];then
         if [ -f "/bin/rm.sh" ];then
-            echo "Try: del /bin/rm.sh"
+            echo "[rm.sh]Try: del /bin/rm.sh"
             "${RMBIN//RM/rm}.bak" -rf "/bin/rm.sh"
             ERROR $?
         fi
 
-        echo "Try: cp -rf ${script_path} /bin/"
+        echo "[rm.sh]Try: cp -rf ${script_path} /bin/"
         cp -rf ${script_path} /bin/
         ERROR $?
     fi    
@@ -408,7 +410,7 @@ function safeInstallScript(){
     for item in ${RMLIST[@]};
     do
         if [ -f ${item} ];then
-            echo "Try: del ${item}"
+            echo "[rm.sh]Try: del ${item}"
             "${RMBIN//RM/rm}.bak" -rf ${item} 
             ERROR $?
         fi
@@ -417,19 +419,19 @@ function safeInstallScript(){
     ERROR $?      
 
     # cp rm.bak --> RM
-    echo "Try: cp -rf ${RMBIN//RM/rm}.bak ${RMBIN//rm/RM}"
+    echo "[rm.sh]Try: cp -rf ${RMBIN//RM/rm}.bak ${RMBIN//rm/RM}"
     cp -rf "${RMBIN//RM/rm}.bak" "${RMBIN//rm/RM}"
     ERROR $?
 
     # cp rm.sh -> rm 
-    echo "Try: link /bin/rm.sh --> ${RMBIN//RM/rm}"
+    echo "[rm.sh]Try: link /bin/rm.sh --> ${RMBIN//RM/rm}"
     ln -s "/bin/rm.sh" ${RMBIN//RM/rm}
     ERROR $?
 
     # alias rm.sh as rm
     profile=$(cat /etc/profile | grep "alias rm=/bin/rm.sh")
     if [ -z "${profile}" ];then
-        echo "Execute: echo 'alias rm=/bin/rm.sh' | tee -a /etc/profile"
+        echo "[rm.sh]Execute: echo 'alias rm=/bin/rm.sh' | tee -a /etc/profile"
         echo "alias rm=/bin/rm.sh" | tee -a /etc/profile
         ERROR $?
     fi
@@ -440,7 +442,7 @@ function installScript(){
     for item in ${RMLIST[@]};
     do
         if [ -f ${item} ];then
-            echo "Try: del ${item}"
+            echo "[rm.sh]Try: del ${item}"
             "${RMBIN//RM/rm}.bak" -rf ${item} 
             ERROR $?
         fi
@@ -449,14 +451,14 @@ function installScript(){
     ERROR $?      
 
     # cp rm.bak --> rm
-    echo "Try: cp -rf ${RMBIN//RM/rm}.bak ${RMBIN//RM/rm}"
+    echo "[rm.sh]Try: cp -rf ${RMBIN//RM/rm}.bak ${RMBIN//RM/rm}"
     cp -rf "${RMBIN//RM/rm}.bak" "${RMBIN//RM/rm}"
     ERROR $?    
 
     # alias rm.sh as rm
     profile=$(cat /etc/profile | grep "alias rm=/bin/rm.sh")
     if [ -z "${profile}" ];then
-        echo "Execute: echo 'alias rm=/bin/rm.sh' | tee -a /etc/profile"
+        echo "[rm.sh]Execute: echo 'alias rm=/bin/rm.sh' | tee -a /etc/profile"
         echo "alias rm=/bin/rm.sh" | tee -a /etc/profile
         ERROR $?
     fi
@@ -470,22 +472,22 @@ function uninstallScript(){
             continue
         fi
         if [ -f ${item} ];then
-            echo "Try: del ${item}"
+            echo "[rm.sh]Try: del ${item}"
             "${RMBIN//RM/rm}.bak" -rf ${item} 
             ERROR $?
         fi
     done
 
     # rm.bak --> rm
-    echo "Try: cp -rf ${RMBIN//RM/rm}.bak ${RMBIN//RM/rm}"
+    echo "[rm.sh]Try: cp -rf ${RMBIN//RM/rm}.bak ${RMBIN//RM/rm}"
     cp -rf "${RMBIN//RM/rm}.bak" "${RMBIN//RM/rm}"
     ERROR $?    
 
     # alsit rm as rm
-    echo "Execute: sudo sed -i 's|alias rm=/bin/rm.sh||g' /etc/profile"
+    echo "[rm.sh]Execute: sudo sed -i 's|alias rm=/bin/rm.sh||g' /etc/profile"
     sed -i 's|alias rm=/bin/rm.sh||g' /etc/profile >>/dev/null 2>&1
     ERROR $?
-    echo "Warn: Restarting the terminal takes effect !"    
+    echo "[rm.sh]Warn: Restarting the terminal takes effect !"    
 }
 
 
@@ -512,7 +514,7 @@ function executeRm(){
         size="$(cat $config_file)"
         if [[ "$size" =~ ^[0-9]+$ ]]; then
             if [ $size -gt $MAXCAPACITY ];then
-                echo "Warn: The capacity of the garbage collection station has reached its maximum limit ! Exit..."
+                echo "[rm.sh]Warn: The capacity of the garbage collection station has reached its maximum limit ! Exit..."
                 exit -1
             fi
         else
@@ -553,10 +555,6 @@ function executeRm(){
 
     flag=false
     for arg in "${FILE_FOLDER_LIST[@]}"; do
-        if [ ! -e $arg ];then
-            echo "cannot access '${arg}': No such file or directory"
-            exit -1
-        fi
         command="${RMBIN//RM/rm}.bak "
         if [ "${PARAMETER_f}" = "true" ];then
             command+="-f "
@@ -585,6 +583,11 @@ function executeRm(){
 
         # 移到回收站
         if [ $PARAMETER_b = "true" ];then
+            if [ ! -e $arg ];then
+                echo "[rm.sh]cannot access '${arg}': No such file or directory"
+                exit -1
+            fi        
+
             absolute_path=$(readlink -f "$arg")
             folder_file_path="${TRASH_DIR}/${absolute_path}"
             folder_file_path=${folder_file_path//\/\//\/}
@@ -603,7 +606,7 @@ function executeRm(){
 
             # 对于垃圾回收站，直接删除
             if [[ $arg == *"${TRASH_DIR}"* ]]; then
-                [ ${PARAMETER_f} = "false" ] && echo "CMD: $command $arg"
+                [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: $command $arg"
                 $command $arg
                 ERROR $?
                 continue
@@ -613,7 +616,7 @@ function executeRm(){
             item_size=$(du -s -b ${arg} | awk '{print $1}') 
             if [[ ${item_size} -gt ${MAXSIZE} ]];then
                 max_size=$(echo "scale=2; $MAXSIZE / 1024 / 1024 / 1024" | bc)
-                echo "Warn: Current '${arg}' size exceeds default single file size (MAXSIZE=${MAXSIZE}B=>${max_size}G) ! Exit..."
+                echo "[rm.sh]Warn: Current '${arg}' size exceeds default single file size (MAXSIZE=${MAXSIZE}B=>${max_size}G) ! Exit..."
                 exit -1
             fi
             
@@ -621,7 +624,7 @@ function executeRm(){
             # echo "absolute_path: $absolute_path"
             # echo "user: $user"
             if [ -f "$absolute_path" ]; then
-                [ ${PARAMETER_f} = "false" ] && echo "CMD: del ${folder_file_path}"
+                [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: del ${folder_file_path}"
                 "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}  >>/dev/null 2>&1
                 ERROR $?
                 
@@ -632,20 +635,20 @@ function executeRm(){
                     ERROR $?
                 fi
 
-                [ ${PARAMETER_f} = "false" ] && echo "Backup to: ${parent_dir}"
+                [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]Backup to: ${parent_dir}"
                 mv -f ${absolute_path} ${parent_dir}
                 ERROR $?
                 continue
             elif [ -d "$absolute_path" ]; then
                 if [ ! ${PARAMETER_r} = "true" ];then
-                    echo "cannot remove '${arg}': Is a directory"
+                    echo "[rm.sh]cannot remove '${arg}': Is a directory"
                     exit -1
                 fi
                 if [ -d ${folder_file_path} ];then
                     "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}  >>/dev/null 2>&1
                     ERROR $?
                 fi
-                [ ${PARAMETER_f} = "false" ] && echo "CMD: del ${folder_file_path}"
+                [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: del ${folder_file_path}"
                 "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}
                 ERROR $?
 
@@ -654,7 +657,7 @@ function executeRm(){
                     sudo -u $user mkdir -p $parent_dir
                 fi
                 
-                [ ${PARAMETER_f} = "false" ] && echo "Backup to: ${parent_dir}"
+                [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]Backup to: ${parent_dir}"
                 mv -f ${absolute_path} ${parent_dir}
                 ERROR $?
                 continue
@@ -663,7 +666,7 @@ function executeRm(){
                 exit -13
             fi
         else
-            [ ${PARAMETER_f} = "false" ] && echo "CMD: $command $arg"
+            [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: $command $arg"
             $command $arg
             ERROR $?
         fi
@@ -691,7 +694,7 @@ args=("$@")
 if [ ${#args[@]} -eq 0 ]; then
     echo "rm: missing operand"
     echo "Try 'rm --help' for more information."
-    echo "By ThreeDays"
+    echo "[rm.sh]By ThreeDays"
     exit 1
 fi
 Main #"${@}"
