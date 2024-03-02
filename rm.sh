@@ -357,10 +357,11 @@ function judgingParameters(){
                 echo -e "for example:\n      rm -rf /$(echo "$Parameter" | cut -d'/' -f2)/foo"
                 exit -1
             fi
+            echo "Parameter: $Parameter"
             FILE_FOLDER_LIST+=("${Parameter}")
         fi
     done
-    FILE_FOLDER_LIST=($(printf "%s\n" "${FILE_FOLDER_LIST[@]}" | sort -u))
+    # FILE_FOLDER_LIST=($(printf "%s\n" "${FILE_FOLDER_LIST[@]}" | sort -u)) 无法处理带空格，特殊字符
 }
 
 
@@ -555,6 +556,7 @@ function executeRm(){
 
     flag=false
     for arg in "${FILE_FOLDER_LIST[@]}"; do
+        echo "arg: $arg"
         command="${RMBIN//RM/rm}.bak "
         if [ "${PARAMETER_f}" = "true" ];then
             command+="-f "
@@ -583,18 +585,18 @@ function executeRm(){
 
         # 移到回收站
         if [ $PARAMETER_b = "true" ];then
-            if [ ! -e $arg ];then
+            if [ ! -e "${arg}" ];then
                 echo "[rm.sh]cannot access '${arg}': No such file or directory"
                 exit -1
             fi        
 
-            absolute_path=$(readlink -f "$arg")
+            absolute_path=$(readlink -f "${arg}")
             folder_file_path="${TRASH_DIR}/${absolute_path}"
-            folder_file_path=${folder_file_path//\/\//\/}
+            folder_file_path="${folder_file_path//\/\//\/}"
 
             # i询问
             if [ $PARAMETER_i = "true" ] && [ $PARAMETER_f = "false" ];then
-                askAbout $arg
+                askAbout "${arg}"
                 [ ! $? = 0 ] && continue
             fi
             # I询问
@@ -605,69 +607,69 @@ function executeRm(){
             fi
 
             # 对于垃圾回收站，直接删除
-            if [[ $arg == *"${TRASH_DIR}"* ]]; then
-                [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: $command $arg"
-                $command $arg
+            if [[ "${arg}" == *"${TRASH_DIR}"* ]]; then
+                [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: $command '${arg}'"
+                $command "${arg}"
                 ERROR $?
                 continue
             fi
             
             # 对于超过MAXSIZE的，不执行
-            item_size=$(du -s -b ${arg} | awk '{print $1}') 
+            item_size="$(du -s -b "${arg}" | awk '{print $1}')"
             if [[ ${item_size} -gt ${MAXSIZE} ]];then
-                max_size=$(echo "scale=2; $MAXSIZE / 1024 / 1024 / 1024" | bc)
+                max_size=$(echo "scale=2; ${MAXSIZE} / 1024 / 1024 / 1024" | bc)
                 echo "[rm.sh]Warn: Current '${arg}' size exceeds default single file size (MAXSIZE=${MAXSIZE}B=>${max_size}G) ! Exit..."
                 exit -1
             fi
             
-            user=$(stat -c "%U" $absolute_path)
+            user="$(stat -c "%U" "${absolute_path}")"
             # echo "absolute_path: $absolute_path"
             # echo "user: $user"
-            if [ -f "$absolute_path" ]; then
+            if [ -f "${absolute_path}" ]; then
                 [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: del ${folder_file_path}"
                 "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}  >>/dev/null 2>&1
                 ERROR $?
                 
-                parent_dir=$(dirname "$folder_file_path")
+                parent_dir=$(dirname "${folder_file_path}")
                 
-                if [ ! -d ${parent_dir} ];then
-                    sudo -u $user mkdir -p ${parent_dir}
+                if [ ! -d "${parent_dir}" ];then
+                    sudo -u ${user} mkdir -p "${parent_dir}"
                     ERROR $?
                 fi
 
                 [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]Backup to: ${parent_dir}"
-                mv -f ${absolute_path} ${parent_dir}
+                mv -f "${absolute_path}" "${parent_dir}"
                 ERROR $?
                 continue
-            elif [ -d "$absolute_path" ]; then
+            elif [ -d "${absolute_path}" ]; then
                 if [ ! ${PARAMETER_r} = "true" ];then
                     echo "[rm.sh]cannot remove '${arg}': Is a directory"
                     exit -1
                 fi
-                if [ -d ${folder_file_path} ];then
-                    "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}  >>/dev/null 2>&1
+                if [ -d "${folder_file_path}" ];then
+                    "${RMBIN//RM/rm}.bak" -rf "${folder_file_path}"  >>/dev/null 2>&1
                     ERROR $?
                 fi
                 [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: del ${folder_file_path}"
-                "${RMBIN//RM/rm}.bak" -rf ${folder_file_path}
+                "${RMBIN//RM/rm}.bak" -rf "${folder_file_path}"
                 ERROR $?
 
                 parent_dir=$(dirname "$folder_file_path")
                 if [ ! -d $parent_dir ];then
-                    sudo -u $user mkdir -p $parent_dir
+                    sudo -u "${user}" mkdir -p "${parent_dir}"
                 fi
                 
                 [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]Backup to: ${parent_dir}"
-                mv -f ${absolute_path} ${parent_dir}
+                mv -f "${absolute_path}" "${parent_dir}"
                 ERROR $?
                 continue
             else
-                echo -e "cannot stat $arg: No such file or directory"
+                echo -e "cannot stat "$arg": No such file or directory"
                 exit -13
             fi
         else
-            [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: $command $arg"
-            $command $arg
+            [ ${PARAMETER_f} = "false" ] && echo "[rm.sh]CMD: $command '${arg}'"
+            $command "${arg}"
             ERROR $?
         fi
     done
