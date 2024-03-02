@@ -357,7 +357,7 @@ function judgingParameters(){
                 echo -e "for example:\n      rm -rf /$(echo "$Parameter" | cut -d'/' -f2)/foo"
                 exit -1
             fi
-            echo "Parameter: $Parameter"
+            # echo "Parameter: $Parameter"
             FILE_FOLDER_LIST+=("${Parameter}")
         fi
     done
@@ -556,7 +556,7 @@ function executeRm(){
 
     flag=false
     for arg in "${FILE_FOLDER_LIST[@]}"; do
-        echo "arg: $arg"
+        # echo "arg: $arg"
         command="${RMBIN//RM/rm}.bak "
         if [ "${PARAMETER_f}" = "true" ];then
             command+="-f "
