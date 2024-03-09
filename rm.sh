@@ -95,8 +95,10 @@ function checkTrashDir(){
     elif [[ "${USER}" = "root" && ! ${SUDO_USER} = "root" ]];then
         user=${SUDO_USER}
     else
-        echo "[rm.sh]Create the garbage collector using the normal user's sudo instead of logging in to root !"
-        exit -1       
+        if [[ ! -d "$TRASH_DIR" ]];then
+            echo "[rm.sh]Create the garbage collector using the normal user's sudo instead of logging in to root !"
+            exit -1       
+        fi
     fi
     
     if [[ ! -d "$TRASH_DIR" ]]; then
